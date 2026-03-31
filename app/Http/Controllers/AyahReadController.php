@@ -31,9 +31,24 @@ class AyahReadController extends Controller
                 ->get(),
         ]);
     }
+/**
+ * Display the full reading history with pagination.
+ */
+public function history(): Response
+{
+    $user = auth()->user();
 
-    /**
-     * Store a new ayah reading entry.
+    return Inertia::render('History', [
+        'history' => $user->ayahReads()
+            ->latest()
+            ->paginate(20),
+        'surahs' => $this->surahService->getSurahs(),
+    ]);
+}
+
+/**
+ * Store a new ayah reading entry.
+...
      */
     public function store(Request $request): RedirectResponse
     {
