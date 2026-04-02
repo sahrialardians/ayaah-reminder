@@ -110,21 +110,23 @@ class AyahReadController extends Controller
     {
         $validated = $request->validate([
             'surah_number' => ['required', 'integer', 'min:1', 'max:114'],
-            'ayah_number' => ['required', 'integer', 'min:1'],
+            'start_ayah' => ['required', 'integer', 'min:1'],
+            'end_ayah' => ['required', 'integer', 'min:1', 'gte:start_ayah'],
             'read_at' => ['nullable', 'date'],
         ]);
 
         $surah = $this->surahService->getSurah($validated['surah_number']);
 
-        if (! $surah || $validated['ayah_number'] > $surah['numberOfAyahs']) {
+        if (! $surah || $validated['end_ayah'] > $surah['numberOfAyahs']) {
             return back()->withErrors([
-                'ayah_number' => "This Surah only has {$surah['numberOfAyahs']} ayahs.",
+                'end_ayah' => "This Surah only has {$surah['numberOfAyahs']} ayahs.",
             ]);
         }
 
         auth()->user()->ayahReads()->create([
             'surah_number' => $validated['surah_number'],
-            'ayah_number' => $validated['ayah_number'],
+            'start_ayah' => $validated['start_ayah'],
+            'end_ayah' => $validated['end_ayah'],
             'read_at' => $validated['read_at'] ?? now(),
         ]);
 

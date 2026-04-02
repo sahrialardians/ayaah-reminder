@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\AyahRead>
+ * @extends Factory<AyahRead>
  */
 class AyahReadFactory extends Factory
 {
@@ -28,7 +28,8 @@ class AyahReadFactory extends Factory
         return [
             'user_id' => User::factory(),
             'surah_number' => $this->faker->numberBetween(1, 114),
-            'ayah_number' => $this->faker->numberBetween(1, 286), // Max ayahs in Al-Baqarah
+            'start_ayah' => 1,
+            'end_ayah' => $this->faker->numberBetween(1, 10), // Example range
             'read_at' => $this->faker->dateTimeBetween('-1 month', 'now'),
         ];
     }
