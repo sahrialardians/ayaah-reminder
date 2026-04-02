@@ -8,7 +8,7 @@ use Illuminate\Support\Collection;
 
 class SurahService
 {
-    private const API_BASE_URL = 'https://api.alquran.cloud/v1';
+    private const API_BASE_URL = 'https://alquran.api.islamic.network/v1';
 
     /**
      * Get the list of all Surahs.

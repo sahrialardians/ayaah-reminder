@@ -1,17 +1,15 @@
 <script setup lang="ts">
-import { Link, usePage } from '@inertiajs/vue3';
-import { computed } from 'vue';
+import { Link } from '@inertiajs/vue3';
+import { MoreVertical, Info, Heart } from 'lucide-vue-next';
 import AppLogo from '@/components/AppLogo.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import UserMenuContent from '@/components/UserMenuContent.vue';
-import { getInitials } from '@/composables/useInitials';
 import { dashboard } from '@/routes';
 import type { BreadcrumbItem } from '@/types';
 
@@ -22,21 +20,18 @@ type Props = {
 const props = withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
 });
-
-const page = usePage();
-const auth = computed(() => page.props.auth);
 </script>
 
 <template>
     <div class="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-sidebar-border/80">
         <div>
-            <div class="mx-auto flex h-16 items-center justify-between px-4 max-w-md">
+            <div class="mx-auto flex h-14 items-center justify-between px-4 max-w-md">
                 <!-- Logo -->
                 <Link :href="dashboard()" class="flex items-center gap-x-2">
                     <AppLogo />
                 </Link>
 
-                <!-- Profile Menu -->
+                <!-- More Menu -->
                 <div class="flex items-center">
                     <DropdownMenu>
                         <DropdownMenuTrigger :as-child="true">
@@ -45,24 +40,22 @@ const auth = computed(() => page.props.auth);
                                 size="icon"
                                 class="relative size-10 w-auto rounded-full p-1 focus-within:ring-2 focus-within:ring-primary"
                             >
-                                <Avatar
-                                    class="size-8 overflow-hidden rounded-full"
-                                >
-                                    <AvatarImage
-                                        v-if="auth.user.avatar"
-                                        :src="auth.user.avatar"
-                                        :alt="auth.user.name"
-                                    />
-                                    <AvatarFallback
-                                        class="rounded-lg bg-neutral-200 font-semibold text-black dark:bg-neutral-700 dark:text-white"
-                                    >
-                                        {{ getInitials(auth.user?.name) }}
-                                    </AvatarFallback>
-                                </Avatar>
+                                <MoreVertical class="h-5 w-5 text-muted-foreground" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" class="w-56">
-                            <UserMenuContent :user="auth.user" />
+                        <DropdownMenuContent align="end" class="w-48">
+                            <DropdownMenuItem as-child>
+                                <a href="#" class="cursor-pointer flex items-center w-full">
+                                    <Info class="mr-2 h-4 w-4" />
+                                    <span>About</span>
+                                </a>
+                            </DropdownMenuItem>
+                            <DropdownMenuItem as-child>
+                                <a href="#" class="cursor-pointer flex items-center w-full text-primary">
+                                    <Heart class="mr-2 h-4 w-4" />
+                                    <span>Donate</span>
+                                </a>
+                            </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </div>

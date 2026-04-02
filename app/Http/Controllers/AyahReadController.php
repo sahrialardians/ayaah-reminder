@@ -25,10 +25,8 @@ class AyahReadController extends Controller
         return Inertia::render('Dashboard', [
             'surahs' => $this->surahService->getSurahs(),
             'latestRead' => $user->latestAyahRead,
-            'history' => $user->ayahReads()
-                ->latest()
-                ->limit(10)
-                ->get(),
+            'totalAyahs' => $user->ayahReads()->count(),
+            'totalSurahs' => $user->ayahReads()->distinct('surah_number')->count('surah_number'),
         ]);
     }
 /**
