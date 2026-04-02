@@ -117,7 +117,7 @@ const getHeatmapColor = (count: number) => {
         <div class="grid gap-4 md:gap-6 md:grid-cols-2">
             <!-- Khatm Progress -->
             <Card title="Khatm Progress" description="Your journey to complete the Qur'an" class="flex flex-col">
-                <div class="p-6 pt-0 flex-1 flex flex-col justify-center gap-4">
+                <div class="p-4 pt-0 flex-1 flex flex-col justify-center gap-4">
                     <div class="flex items-end justify-between">
                         <span class="text-3xl font-extrabold text-primary">{{ khatmProgress }}%</span>
                         <span class="text-sm text-muted-foreground mb-1">{{ totalAyahs }} / 6236 Ayahs</span>
@@ -133,7 +133,7 @@ const getHeatmapColor = (count: number) => {
 
             <!-- Activity & Streak -->
             <Card title="Activity" description="Your reading consistency" class="flex flex-col">
-                <div class="p-6 pt-0 flex flex-col gap-6">
+                <div class="p-4 pt-0 flex flex-col gap-6">
                     <div class="flex items-center gap-4">
                         <div class="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>

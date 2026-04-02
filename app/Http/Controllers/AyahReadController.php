@@ -95,9 +95,9 @@ class AyahReadController extends Controller
         $user = auth()->user();
 
         return Inertia::render('History', [
-            'history' => $user->ayahReads()
+            'history' => Inertia::scroll(fn () => $user->ayahReads()
                 ->latest()
-                ->paginate(20),
+                ->paginate(15)),
             'surahs' => $this->surahService->getSurahs(),
         ]);
     }
