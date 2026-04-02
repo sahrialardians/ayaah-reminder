@@ -23,7 +23,7 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Reminder settings',
+                title: 'Reminder',
                 href: edit(),
             },
         ],
@@ -37,9 +37,9 @@ const timezones = [
 </script>
 
 <template>
-    <Head title="Reminder settings" />
+    <Head title="Reminder" />
 
-    <h1 class="sr-only">Reminder settings</h1>
+    <h1 class="sr-only">Reminder</h1>
 
     <div class="flex flex-col space-y-6">
         <Heading

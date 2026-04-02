@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Link } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import { MoreVertical, Info, Heart } from 'lucide-vue-next';
-import AppLogo from '@/components/AppLogo.vue';
 import Breadcrumbs from '@/components/Breadcrumbs.vue';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,15 +20,23 @@ type Props = {
 const props = withDefaults(defineProps<Props>(), {
     breadcrumbs: () => [],
 });
+
+const pageTitle = computed(() => {
+    if (props.breadcrumbs && props.breadcrumbs.length > 0) {
+        const title = props.breadcrumbs[props.breadcrumbs.length - 1].title;
+        return title === 'Dashboard' ? 'Ayaah Reminder' : title;
+    }
+    return 'Ayaah Reminder';
+});
 </script>
 
 <template>
     <div class="sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-sidebar-border/80">
         <div>
             <div class="mx-auto flex h-14 items-center justify-between px-4 max-w-md">
-                <!-- Logo -->
+                <!-- Logo/Title -->
                 <Link :href="dashboard()" class="flex items-center gap-x-2">
-                    <AppLogo />
+                    <span class="text-lg font-bold tracking-tight">{{ pageTitle }}</span>
                 </Link>
 
                 <!-- More Menu -->
