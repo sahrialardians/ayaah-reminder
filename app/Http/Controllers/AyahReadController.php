@@ -78,7 +78,6 @@ class AyahReadController extends Controller
 
         return Inertia::render('Dashboard', [
             'surahs' => $this->surahService->getSurahs(),
-            'latestRead' => $user->latestAyahRead,
             'totalAyahs' => (int) $user->ayahReads()->sum(\Illuminate\Support\Facades\DB::raw('end_ayah - start_ayah + 1')),
             'totalSurahs' => $user->ayahReads()->distinct('surah_number')->count('surah_number'),
             'streak' => $streak,

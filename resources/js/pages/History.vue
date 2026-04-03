@@ -28,6 +28,7 @@ interface PaginatedHistory {
 interface Props {
     history: PaginatedHistory;
     surahs: Surah[];
+    latestRead?: AyahRead | null;
 }
 
 const props = defineProps<Props>();

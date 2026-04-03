@@ -45,6 +45,7 @@ class HandleInertiaRequests extends Middleware
                 'status' => $request->session()->get('status'),
             ],
             'surahs' => fn () => $request->user() ? app(\App\Services\SurahService::class)->getSurahs() : [],
+            'latestRead' => fn () => $request->user()?->latestAyahRead?->toArray(),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
