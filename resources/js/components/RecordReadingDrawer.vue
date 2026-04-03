@@ -109,10 +109,10 @@ const submit = () => {
         <SheetTrigger asChild>
             <slot />
         </SheetTrigger>
-        <SheetContent side="bottom" class="h-[85vh] rounded-t-[2rem] px-4 py-8 sm:max-w-md mx-auto sm:h-auto sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:rounded-[2rem] flex flex-col gap-0">
-            <SheetHeader class="text-left mb-6 px-2">
-                <SheetTitle class="text-2xl font-bold">Record Reading</SheetTitle>
-                <p class="text-sm text-muted-foreground">Select your progress</p>
+        <SheetContent side="bottom" class="h-[85vh] rounded-t-[2rem] px-4 py-4 sm:max-w-md mx-auto sm:h-auto sm:bottom-auto sm:top-1/2 sm:-translate-y-1/2 sm:rounded-[2rem] flex flex-col gap-0">
+            <SheetHeader class="text-left gap-0 px-1">
+                <SheetTitle class="text-xl font-bold tracking-tight">Add Progress</SheetTitle>
+                <p class="text-sm text-muted-foreground">Log the last ayah you read</p>
             </SheetHeader>
 
             <form @submit.prevent="submit" class="flex-1 overflow-y-auto custom-scrollbar px-2 space-y-6">
@@ -124,23 +124,10 @@ const submit = () => {
                         />
                     </FormGroup>
 
-                    <div v-if="selectedSurah" class="space-y-4 animate-in fade-in slide-in-from-top-2">
-                        
-                        <div class="flex items-center justify-between bg-muted/20 p-3 rounded-lg border">
-                            <div class="flex flex-col">
-                                <label class="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Start Ayah</label>
-                                <Input 
-                                    v-model="form.start_ayah" 
-                                    type="number" 
-                                    min="1" 
-                                    :max="selectedSurah.numberOfAyahs" 
-                                    class="h-8 w-20 text-center font-bold text-primary"
-                                />
-                            </div>
-                            <div class="flex flex-col items-end">
-                                <label class="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">End Ayah</label>
-                                <span class="h-8 flex items-center text-lg font-extrabold text-primary">{{ form.end_ayah }}</span>
-                            </div>
+                    <div v-if="selectedSurah" class="space-y-3 animate-in fade-in slide-in-from-top-2">
+                        <div class="flex items-center justify-between">
+                            <label class="text-sm font-medium leading-none">2. Select Ayah</label>
+                            <span class="text-xs text-primary font-bold">Selected: {{ form.start_ayah }} - {{ form.end_ayah }}</span>
                         </div>
                         
                         <div class="p-4 rounded-xl border bg-muted/30">
