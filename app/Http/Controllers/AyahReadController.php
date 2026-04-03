@@ -51,7 +51,7 @@ class AyahReadController extends Controller
         $thirtyDaysAgo = now()->subDays(29)->startOfDay();
         $activity = $user->ayahReads()
             ->where('read_at', '>=', $thirtyDaysAgo)
-            ->selectRaw('DATE(read_at) as date, count(*) as count')
+            ->selectRaw('DATE(read_at) as date, SUM(end_ayah - start_ayah + 1) as count')
             ->groupBy('date')
             ->pluck('count', 'date')
             ->toArray();
@@ -61,7 +61,7 @@ class AyahReadController extends Controller
             $dateString = now()->subDays($i)->format('Y-m-d');
             $heatmap[] = [
                 'date' => $dateString,
-                'count' => $activity[$dateString] ?? 0,
+                'count' => (int) ($activity[$dateString] ?? 0),
             ];
         }
 
@@ -79,7 +79,7 @@ class AyahReadController extends Controller
         return Inertia::render('Dashboard', [
             'surahs' => $this->surahService->getSurahs(),
             'latestRead' => $user->latestAyahRead,
-            'totalAyahs' => $user->ayahReads()->count(),
+            'totalAyahs' => (int) $user->ayahReads()->sum(\Illuminate\Support\Facades\DB::raw('end_ayah - start_ayah + 1')),
             'totalSurahs' => $user->ayahReads()->distinct('surah_number')->count('surah_number'),
             'streak' => $streak,
             'heatmap' => $heatmap,

@@ -86,6 +86,11 @@ const getHeatmapColor = (count: number) => {
     if (intensity === 3) return 'bg-primary/75';
     return 'bg-primary';
 };
+
+const formatAyahRange = (start: number, end: number) => {
+    if (!start || !end) return '';
+    return start === end ? end.toString() : `${start}-${end}`;
+};
 </script>
 
 <template>
@@ -111,6 +116,32 @@ const getHeatmapColor = (count: number) => {
                 <span class="text-xs uppercase tracking-widest font-bold opacity-70">Daily Inspiration</span>
                 <p class="text-lg font-medium leading-relaxed italic">"{{ dailyQuote.text }}"</p>
                 <span class="text-sm opacity-80 mt-2">— {{ dailyQuote.source }}</span>
+            </div>
+        </Card>
+
+        <!-- Current Status Stats (3 Columns) -->
+        <Card v-if="latestRead" class="overflow-hidden">
+            <div class="grid grid-cols-3 divide-x text-center">
+                <div class="flex flex-col p-4 sm:p-6 bg-muted/10">
+                    <span class="text-xs text-muted-foreground uppercase tracking-widest font-bold mb-2">Last Read</span>
+                    <span class="text-xl font-extrabold text-primary truncate px-1" :title="getSurahName(latestRead.surah_number) + ' : ' + formatAyahRange(latestRead.start_ayah, latestRead.end_ayah)">
+                        <span class="hidden sm:inline">{{ getSurahName(latestRead.surah_number) }} : {{ formatAyahRange(latestRead.start_ayah, latestRead.end_ayah) }}</span>
+                        <span class="sm:hidden">{{ latestRead.surah_number }}:{{ formatAyahRange(latestRead.start_ayah, latestRead.end_ayah) }}</span>
+                    </span>
+                </div>
+                <div class="flex flex-col p-4 sm:p-6 bg-muted/10">
+                    <span class="text-xs text-muted-foreground uppercase tracking-widest font-bold mb-2">Total Ayahs</span>
+                    <span class="text-xl font-extrabold text-primary px-1">{{ totalAyahs }}</span>
+                </div>
+                <div class="flex flex-col p-4 sm:p-6 bg-muted/10">
+                    <span class="text-xs text-muted-foreground uppercase tracking-widest font-bold mb-2">Total Surahs</span>
+                    <span class="text-xl font-extrabold text-primary">{{ totalSurahs }}</span>
+                </div>
+            </div>
+        </Card>
+        <Card v-else>
+            <div class="py-8 text-center text-muted-foreground text-sm">
+                No reading history yet. Start your journey today by tapping the + icon!
             </div>
         </Card>
 
