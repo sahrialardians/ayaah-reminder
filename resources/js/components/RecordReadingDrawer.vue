@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { useForm, usePage } from '@inertiajs/vue3';
-import { computed, watch, ref } from 'vue';
+import { computed, watch, ref, nextTick } from 'vue';
 import FormGroup from '@/components/FormGroup.vue';
 import SurahSelect from '@/components/SurahSelect.vue';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
     Sheet,
     SheetContent,
@@ -36,28 +37,61 @@ const latestRead = computed(() => page.props.latestRead as AyahRead | null);
 
 const form = useForm({
     surah_number: latestRead.value?.surah_number ?? '',
-    start_ayah: 1,
-    end_ayah: latestRead.value?.end_ayah ?? '',
+    start_ayah: latestRead.value ? Math.min(latestRead.value.end_ayah + 1, 999) : 1,
+    end_ayah: latestRead.value ? Math.min(latestRead.value.end_ayah + 1, 999) : 1,
 });
 
 const selectedSurah = computed(() => {
     return surahs.value.find((s) => s.number === Number(form.surah_number));
 });
 
-watch(() => form.surah_number, (newSurah) => {
-    if (selectedSurah.value) {
-        // If the user selected the same Surah as their latest read, start from the next Ayah
-        if (latestRead.value && latestRead.value.surah_number === selectedSurah.value.number) {
-            form.start_ayah = Math.min(latestRead.value.end_ayah + 1, selectedSurah.value.numberOfAyahs);
-            form.end_ayah = form.start_ayah;
+const isOpen = ref(false);
+
+const scrollToAyah = async (ayahNumber: number) => {
+    await nextTick();
+    // Use setTimeout to ensure the modal animation finishes before scrolling
+    setTimeout(() => {
+        const btn = document.getElementById(`ayah-btn-${ayahNumber}`);
+        if (btn) {
+            btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }, 100);
+};
+
+// When the drawer opens, sync with the very latest read from the server
+watch(isOpen, (open) => {
+    if (open) {
+        if (latestRead.value) {
+            form.surah_number = latestRead.value.surah_number;
+            const surah = surahs.value.find(s => s.number === Number(form.surah_number));
+            const maxAyahs = surah ? surah.numberOfAyahs : 999;
+            const nextAyah = Math.min(latestRead.value.end_ayah + 1, maxAyahs);
+            form.start_ayah = nextAyah;
+            form.end_ayah = nextAyah;
+            scrollToAyah(nextAyah);
         } else {
+            form.surah_number = '';
             form.start_ayah = 1;
             form.end_ayah = 1;
         }
     }
 });
 
-const isOpen = ref(false);
+// When the user changes the Surah manually in the dropdown
+watch(() => form.surah_number, (newSurah, oldSurah) => {
+    if (newSurah && newSurah !== oldSurah && selectedSurah.value && isOpen.value) {
+        if (latestRead.value && latestRead.value.surah_number === selectedSurah.value.number) {
+            const nextAyah = Math.min(latestRead.value.end_ayah + 1, selectedSurah.value.numberOfAyahs);
+            form.start_ayah = nextAyah;
+            form.end_ayah = nextAyah;
+            scrollToAyah(nextAyah);
+        } else {
+            form.start_ayah = 1;
+            form.end_ayah = 1;
+            scrollToAyah(1);
+        }
+    }
+});
 
 const submit = () => {
     form.post('/ayah', {
@@ -90,19 +124,34 @@ const submit = () => {
                         />
                     </FormGroup>
 
-                    <div v-if="selectedSurah" class="space-y-3 animate-in fade-in slide-in-from-top-2">
-                        <div class="flex items-center justify-between">
-                            <label class="text-sm font-medium leading-none italic">2. Ayah Range</label>
-                            <span class="text-xs text-primary font-bold">Selected: {{ form.start_ayah }} - {{ form.end_ayah }}</span>
+                    <div v-if="selectedSurah" class="space-y-4 animate-in fade-in slide-in-from-top-2">
+                        
+                        <div class="flex items-center justify-between bg-muted/20 p-3 rounded-lg border">
+                            <div class="flex flex-col">
+                                <label class="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">Start Ayah</label>
+                                <Input 
+                                    v-model="form.start_ayah" 
+                                    type="number" 
+                                    min="1" 
+                                    :max="selectedSurah.numberOfAyahs" 
+                                    class="h-8 w-20 text-center font-bold text-primary"
+                                />
+                            </div>
+                            <div class="flex flex-col items-end">
+                                <label class="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-1">End Ayah</label>
+                                <span class="h-8 flex items-center text-lg font-extrabold text-primary">{{ form.end_ayah }}</span>
+                            </div>
                         </div>
                         
                         <div class="p-4 rounded-xl border bg-muted/30">
-                            <div class="grid grid-cols-5 gap-2 max-h-64 overflow-y-auto p-1 custom-scrollbar">
+                            <label class="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3 block text-center">Tap where you stopped</label>
+                            <div class="grid grid-cols-5 gap-2 max-h-56 overflow-y-auto p-1 custom-scrollbar">
                                 <button
                                     v-for="n in selectedSurah.numberOfAyahs"
                                     :key="n"
+                                    :id="`ayah-btn-${n}`"
                                     type="button"
-                                    @click="form.end_ayah = Math.max(n, form.start_ayah)"
+                                    @click="form.end_ayah = n"
                                     :class="[
                                         'h-10 w-full text-xs rounded-lg border transition-all flex items-center justify-center font-bold',
                                         n >= form.start_ayah && n <= form.end_ayah
@@ -116,8 +165,7 @@ const submit = () => {
                             <p class="mt-3 text-[10px] text-muted-foreground text-center uppercase tracking-widest font-semibold">
                                 {{ selectedSurah.englishName }} contains {{ selectedSurah.numberOfAyahs }} ayahs
                             </p>
-                            <input type="hidden" name="start_ayah" :value="form.start_ayah" />
-                            <input type="hidden" name="end_ayah" :value="form.end_ayah" />
+                            
                             <div v-if="form.errors.start_ayah || form.errors.end_ayah" class="mt-2 text-xs text-destructive text-center font-medium">
                                 {{ form.errors.start_ayah || form.errors.end_ayah }}
                             </div>
@@ -125,10 +173,10 @@ const submit = () => {
                     </div>
                 </div>
 
-                <div class="pt-6 pb-safe">
+                <div class="pt-4 pb-safe">
                     <Button
                         type="submit"
-                        :disabled="form.processing || !form.surah_number"
+                        :disabled="form.processing || !form.surah_number || form.end_ayah < form.start_ayah"
                         size="lg"
                         class="w-full h-14 rounded-full font-bold shadow-lg hover:shadow-primary/20 transition-all text-lg"
                     >
