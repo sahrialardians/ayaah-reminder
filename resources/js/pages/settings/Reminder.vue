@@ -30,9 +30,19 @@ defineOptions({
     },
 });
 
-// Timezones list (simplified for example)
+// Timezones list (common timezones)
 const timezones = [
-    'UTC', 'Asia/Jakarta', 'Asia/Riyadh', 'Europe/London', 'America/New_York'
+    'UTC', 
+    'Asia/Jakarta', 
+    'Asia/Kuala_Lumpur',
+    'Asia/Singapore',
+    'Asia/Riyadh', 
+    'Asia/Dubai',
+    'Europe/London', 
+    'Europe/Paris',
+    'America/New_York',
+    'America/Los_Angeles',
+    'Australia/Sydney'
 ];
 </script>
 
