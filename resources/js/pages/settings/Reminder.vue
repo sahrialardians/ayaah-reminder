@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Form, Head } from '@inertiajs/vue3';
+import { useForm, Head } from '@inertiajs/vue3';
 import ReminderController from '@/actions/App/Http/Controllers/Settings/ReminderController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
@@ -15,9 +15,15 @@ interface Settings {
     timezone: string;
 }
 
-const props = defineProps<{
-    settings: Settings;
-}>();
+const props = withDefaults(defineProps<{
+    settings?: Settings;
+}>(), {
+    settings: () => ({
+        is_enabled: true,
+        reminder_time: '08:00:00',
+        timezone: 'UTC'
+    })
+});
 
 defineOptions({
     layout: {
@@ -30,9 +36,31 @@ defineOptions({
     },
 });
 
-// Timezones list (simplified for example)
+const form = useForm({
+    is_enabled: props.settings?.is_enabled ?? true,
+    reminder_time: (props.settings?.reminder_time ?? '08:00:00').substring(0, 5),
+    timezone: props.settings?.timezone ?? 'UTC',
+});
+
+const submit = () => {
+    form.patch(ReminderController.update().url, {
+        preserveScroll: true,
+    });
+};
+
+// Timezones list (common timezones)
 const timezones = [
-    'UTC', 'Asia/Jakarta', 'Asia/Riyadh', 'Europe/London', 'America/New_York'
+    'UTC', 
+    'Asia/Jakarta', 
+    'Asia/Kuala_Lumpur',
+    'Asia/Singapore',
+    'Asia/Riyadh', 
+    'Asia/Dubai',
+    'Europe/London', 
+    'Europe/Paris',
+    'America/New_York',
+    'America/Los_Angeles',
+    'Australia/Sydney'
 ];
 </script>
 
@@ -48,17 +76,12 @@ const timezones = [
             description="Manage how and when you receive reminders to read your Ayah."
         />
 
-        <Form
-            v-bind="ReminderController.update.form()"
-            class="space-y-6"
-            v-slot="{ errors, processing, recentlySuccessful, setFieldValue, values }"
-        >
+        <form @submit.prevent="submit" class="space-y-6">
             <div class="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                 <Checkbox
                     id="is_enabled"
-                    name="is_enabled"
-                    :checked="values.is_enabled ?? settings.is_enabled"
-                    @update:checked="(checked) => setFieldValue('is_enabled', checked)"
+                    :checked="form.is_enabled"
+                    @update:checked="(checked) => form.is_enabled = checked"
                 />
                 <div class="space-y-1 leading-none">
                     <Label for="is_enabled">Enable Daily Reminders</Label>
@@ -74,30 +97,29 @@ const timezones = [
                     id="reminder_time"
                     type="time"
                     class="mt-1 block w-full"
-                    name="reminder_time"
-                    :default-value="settings.reminder_time.substring(0, 5)"
+                    v-model="form.reminder_time"
                     required
                 />
-                <InputError class="mt-2" :message="errors.reminder_time" />
+                <InputError class="mt-2" :message="form.errors.reminder_time" />
             </div>
 
             <div class="grid gap-2">
                 <Label for="timezone">Timezone</Label>
                 <select
                     id="timezone"
-                    name="timezone"
+                    v-model="form.timezone"
                     class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     required
                 >
-                    <option v-for="tz in timezones" :key="tz" :value="tz" :selected="tz === settings.timezone">
+                    <option v-for="tz in timezones" :key="tz" :value="tz">
                         {{ tz }}
                     </option>
                 </select>
-                <InputError class="mt-2" :message="errors.timezone" />
+                <InputError class="mt-2" :message="form.errors.timezone" />
             </div>
 
             <div class="flex items-center gap-4">
-                <Button :disabled="processing">Save</Button>
+                <Button :disabled="form.processing">Save</Button>
 
                 <Transition
                     enter-active-class="transition ease-in-out"
@@ -106,13 +128,13 @@ const timezones = [
                     leave-to-class="opacity-0"
                 >
                     <p
-                        v-show="recentlySuccessful"
+                        v-show="form.recentlySuccessful"
                         class="text-sm text-neutral-600"
                     >
                         Saved.
                     </p>
                 </Transition>
             </div>
-        </Form>
+        </form>
     </div>
 </template>

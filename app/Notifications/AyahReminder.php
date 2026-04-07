@@ -14,7 +14,7 @@ class AyahReminder extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct(protected string $surahName, protected int $ayahNumber)
+    public function __construct(protected string $surahName, protected int $startAyah, protected int $endAyah)
     {
         //
     }
@@ -34,13 +34,17 @@ class AyahReminder extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
+        $range = $this->startAyah === $this->endAyah
+            ? $this->startAyah
+            : "{$this->startAyah}-{$this->endAyah}";
+
         return (new MailMessage)
-                    ->subject('Your Daily Ayah Reminder')
-                    ->greeting('Assalamu Alaikum, ' . $notifiable->name . '!')
-                    ->line('This is a gentle reminder to continue your Qur\'an reading journey.')
-                    ->line("Your last recorded progress: **{$this->surahName}**, Ayah **{$this->ayahNumber}**.")
-                    ->action('Continue Reading', url('/dashboard'))
-                    ->line('May Allah make it easy for you and accept your efforts.');
+            ->subject('Your Daily Ayah Reminder')
+            ->greeting('Assalamu Alaikum, '.$notifiable->name.'!')
+            ->line('This is a gentle reminder to continue your Qur\'an reading journey.')
+            ->line("Your last recorded progress: **{$this->surahName}**, Ayah **{$range}**.")
+            ->action('Continue Reading', url('/dashboard'))
+            ->line('May Allah make it easy for you and accept your efforts.');
     }
 
     /**
@@ -52,7 +56,8 @@ class AyahReminder extends Notification implements ShouldQueue
     {
         return [
             'surah_name' => $this->surahName,
-            'ayah_number' => $this->ayahNumber,
+            'start_ayah' => $this->startAyah,
+            'end_ayah' => $this->endAyah,
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\AyahReadFactory;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AyahRead extends Model
 {
-    /** @use HasFactory<\Database\Factories\AyahReadFactory> */
+    /** @use HasFactory<AyahReadFactory> */
     use HasFactory, HasUuids;
 
     /**
@@ -20,7 +21,8 @@ class AyahRead extends Model
     protected $fillable = [
         'user_id',
         'surah_number',
-        'ayah_number',
+        'start_ayah',
+        'end_ayah',
         'read_at',
     ];
 
@@ -34,7 +36,8 @@ class AyahRead extends Model
         return [
             'read_at' => 'datetime',
             'surah_number' => 'integer',
-            'ayah_number' => 'integer',
+            'start_ayah' => 'integer',
+            'end_ayah' => 'integer',
         ];
     }
 

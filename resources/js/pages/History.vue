@@ -13,7 +13,8 @@ interface Surah {
 interface AyahRead {
     id: string;
     surah_number: number;
-    ayah_number: number;
+    start_ayah: number;
+    end_ayah: number;
     read_at: string;
 }
 
@@ -27,6 +28,7 @@ interface PaginatedHistory {
 interface Props {
     history: PaginatedHistory;
     surahs: Surah[];
+    latestRead?: AyahRead | null;
 }
 
 const props = defineProps<Props>();
@@ -57,6 +59,10 @@ const formatDate = (dateString: string) => {
         hour: '2-digit',
         minute: '2-digit'
     });
+};
+
+const formatAyahRange = (start: number, end: number) => {
+    return start === end ? end.toString() : `${start}-${end}`;
 };
 </script>
 
@@ -91,7 +97,7 @@ const formatDate = (dateString: string) => {
                         </div>
                         <div class="flex flex-col items-end shrink-0 text-primary">
                             <span class="text-[10px] font-bold opacity-70 uppercase tracking-widest leading-none mb-0.5">Ayah</span>
-                            <span class="text-lg sm:text-xl font-extrabold leading-none">{{ entry.ayah_number }}</span>
+                            <span class="text-lg sm:text-xl font-extrabold leading-none">{{ formatAyahRange(entry.start_ayah, entry.end_ayah) }}</span>
                         </div>
                     </div>
                 </div>

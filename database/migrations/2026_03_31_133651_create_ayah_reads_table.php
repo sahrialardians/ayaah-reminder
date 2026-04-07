@@ -15,7 +15,8 @@ return new class extends Migration
             $blueprint->uuid('id')->primary();
             $blueprint->foreignUuid('user_id')->constrained()->cascadeOnDelete();
             $blueprint->unsignedSmallInteger('surah_number');
-            $blueprint->unsignedSmallInteger('ayah_number');
+            $blueprint->unsignedSmallInteger('start_ayah')->default(1);
+            $blueprint->unsignedSmallInteger('end_ayah');
             $blueprint->timestamp('read_at')->useCurrent();
             $blueprint->timestamps();
 

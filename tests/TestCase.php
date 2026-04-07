@@ -3,10 +3,41 @@
 namespace Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Http;
 use Laravel\Fortify\Features;
 
 abstract class TestCase extends BaseTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Http::fake([
+            'alquran.api.islamic.network/v1/surah' => Http::response([
+                'data' => [
+                    [
+                        'number' => 1,
+                        'name' => 'سُورَةُ ٱلْفَاتِحَةِ',
+                        'englishName' => 'Al-Faatiha',
+                        'englishNameTranslation' => 'The Opening',
+                        'numberOfAyahs' => 7,
+                        'revelationType' => 'Meccan',
+                    ],
+                ],
+            ], 200),
+            'alquran.api.islamic.network/v1/surah/*' => Http::response([
+                'data' => [
+                    'number' => 1,
+                    'name' => 'سُورَةُ ٱلْفَاتِحَةِ',
+                    'englishName' => 'Al-Faatiha',
+                    'englishNameTranslation' => 'The Opening',
+                    'numberOfAyahs' => 7,
+                    'revelationType' => 'Meccan',
+                ],
+            ], 200),
+        ]);
+    }
+
     protected function skipUnlessFortifyHas(string $feature, ?string $message = null): void
     {
         if (! Features::enabled($feature)) {

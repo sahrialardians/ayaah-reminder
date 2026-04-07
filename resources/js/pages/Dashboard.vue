@@ -30,7 +30,6 @@ interface Quote {
 
 interface Props {
     surahs?: Surah[];
-    latestRead?: AyahRead | null;
     totalAyahs?: number;
     totalSurahs?: number;
     streak?: number;

@@ -51,7 +51,7 @@ class AyahReadController extends Controller
         $thirtyDaysAgo = now()->subDays(29)->startOfDay();
         $activity = $user->ayahReads()
             ->where('read_at', '>=', $thirtyDaysAgo)
-            ->selectRaw('DATE(read_at) as date, count(*) as count')
+            ->selectRaw('DATE(read_at) as date, SUM(end_ayah - start_ayah + 1) as count')
             ->groupBy('date')
             ->pluck('count', 'date')
             ->toArray();
@@ -61,7 +61,7 @@ class AyahReadController extends Controller
             $dateString = now()->subDays($i)->format('Y-m-d');
             $heatmap[] = [
                 'date' => $dateString,
-                'count' => $activity[$dateString] ?? 0,
+                'count' => (int) ($activity[$dateString] ?? 0),
             ];
         }
 
@@ -78,8 +78,7 @@ class AyahReadController extends Controller
 
         return Inertia::render('Dashboard', [
             'surahs' => $this->surahService->getSurahs(),
-            'latestRead' => $user->latestAyahRead,
-            'totalAyahs' => $user->ayahReads()->count(),
+            'totalAyahs' => (int) $user->ayahReads()->sum(\Illuminate\Support\Facades\DB::raw('end_ayah - start_ayah + 1')),
             'totalSurahs' => $user->ayahReads()->distinct('surah_number')->count('surah_number'),
             'streak' => $streak,
             'heatmap' => $heatmap,
@@ -110,21 +109,23 @@ class AyahReadController extends Controller
     {
         $validated = $request->validate([
             'surah_number' => ['required', 'integer', 'min:1', 'max:114'],
-            'ayah_number' => ['required', 'integer', 'min:1'],
+            'start_ayah' => ['required', 'integer', 'min:1'],
+            'end_ayah' => ['required', 'integer', 'min:1', 'gte:start_ayah'],
             'read_at' => ['nullable', 'date'],
         ]);
 
         $surah = $this->surahService->getSurah($validated['surah_number']);
 
-        if (! $surah || $validated['ayah_number'] > $surah['numberOfAyahs']) {
+        if (! $surah || $validated['end_ayah'] > $surah['numberOfAyahs']) {
             return back()->withErrors([
-                'ayah_number' => "This Surah only has {$surah['numberOfAyahs']} ayahs.",
+                'end_ayah' => "This Surah only has {$surah['numberOfAyahs']} ayahs.",
             ]);
         }
 
         auth()->user()->ayahReads()->create([
             'surah_number' => $validated['surah_number'],
-            'ayah_number' => $validated['ayah_number'],
+            'start_ayah' => $validated['start_ayah'],
+            'end_ayah' => $validated['end_ayah'],
             'read_at' => $validated['read_at'] ?? now(),
         ]);
 
