@@ -20,7 +20,13 @@ Schedule::call(function (SurahService $surahService) {
         // Convert user's scheduled time to UTC for comparison or handle via local timezone
         // Simple approach: Check if current time in user's timezone matches their reminder_time
         $userTime = now($settings->timezone);
-        $scheduledTime = Carbon::createFromFormat('H:i:s', $settings->reminder_time, $settings->timezone);
+
+        try {
+            $timeFormat = strlen($settings->reminder_time) > 5 ? 'H:i:s' : 'H:i';
+            $scheduledTime = Carbon::createFromFormat($timeFormat, $settings->reminder_time, $settings->timezone);
+        } catch (Exception $e) {
+            continue; // Skip if format is completely invalid
+        }
 
         if ($userTime->hour === $scheduledTime->hour && $userTime->minute === $scheduledTime->minute) {
             $latestRead = $user->latestAyahRead;

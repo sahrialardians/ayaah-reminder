@@ -15,9 +15,15 @@ interface Settings {
     timezone: string;
 }
 
-const props = defineProps<{
-    settings: Settings;
-}>();
+const props = withDefaults(defineProps<{
+    settings?: Settings;
+}>(), {
+    settings: () => ({
+        is_enabled: true,
+        reminder_time: '08:00:00',
+        timezone: 'UTC'
+    })
+});
 
 defineOptions({
     layout: {
@@ -31,9 +37,9 @@ defineOptions({
 });
 
 const form = useForm({
-    is_enabled: props.settings.is_enabled,
-    reminder_time: props.settings.reminder_time.substring(0, 5),
-    timezone: props.settings.timezone,
+    is_enabled: props.settings?.is_enabled ?? true,
+    reminder_time: (props.settings?.reminder_time ?? '08:00:00').substring(0, 5),
+    timezone: props.settings?.timezone ?? 'UTC',
 });
 
 const submit = () => {
