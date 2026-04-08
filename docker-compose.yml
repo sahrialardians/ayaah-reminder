@@ -27,6 +27,34 @@ services:
     networks:
       - ayaah-network
 
+  scheduler:
+    image: ayaah-reminder-app
+    container_name: ayaah-reminder-scheduler
+    restart: unless-stopped
+    command: php artisan schedule:work
+    volumes:
+      - ./:/app
+      - /app/public/build
+    depends_on:
+      - app
+      - db
+    networks:
+      - ayaah-network
+
+  queue:
+    image: ayaah-reminder-app
+    container_name: ayaah-reminder-queue
+    restart: unless-stopped
+    command: php artisan queue:work
+    volumes:
+      - ./:/app
+      - /app/public/build
+    depends_on:
+      - app
+      - db
+    networks:
+      - ayaah-network
+
   db:
     image: mysql:8.0
     container_name: ayaah-reminder-db
