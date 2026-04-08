@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ayaah-reminder-app
+    container_name: ayaah-reminder-app
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      SERVER_NAME: :80
+      # Use the Laravel Octane / FrankenPHP bridge if needed, 
+      # but by default FrankenPHP serves the public folder.
+      # APP_RUNTIME: FrankenPHP\Laravel\Runtime
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_DATABASE: ${DB_DATABASE:-ayaah_reminder}
+      DB_USERNAME: ${DB_USERNAME:-root}
+      DB_PASSWORD: ${DB_PASSWORD:-Bismillah}
+    volumes:
+      - ./:/app
+    networks:
+      - ayaah-network
+
+  db:
+    image: mysql:8.0
+    container_name: ayaah-reminder-db
+    restart: unless-stopped
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-ayaah_reminder}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-Bismillah}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-Bismillah}
+      MYSQL_USER: ${DB_USERNAME:-root}
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - ayaah-network
+
+networks:
+  ayaah-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+    driver: local
