@@ -18,9 +18,9 @@ services:
       DB_CONNECTION: mysql
       DB_HOST: db
       DB_PORT: 3306
-      DB_DATABASE: ${DB_DATABASE:-ayaah_reminder}
-      DB_USERNAME: ${DB_USERNAME:-root}
-      DB_PASSWORD: ${DB_PASSWORD:-Bismillah}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
     volumes:
       - ./:/app
     networks:
@@ -33,10 +33,10 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_DATABASE: ${DB_DATABASE:-ayaah_reminder}
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-Bismillah}
-      MYSQL_PASSWORD: ${DB_PASSWORD:-Bismillah}
-      MYSQL_USER: ${DB_USERNAME:-root}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
     volumes:
       - dbdata:/var/lib/mysql
     networks:
